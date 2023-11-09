@@ -2,10 +2,29 @@ const {ProductModel}=require("../model/productModel")
 
 // get All product
 
-const getProduct=async(req,res)=>{
+const getProduct = async (req, res) => {
+    try {
+      if (req.params.id) {
+        const productById = await ProductModel.findById(req.params.id);
+        res.status(200).json({ "Product by ID": productById });
+      } else {
+        const allProducts = await ProductModel.find();
+        res.status(200).json({ "AllProducts": allProducts });
+      }
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  };
+
+
+// add/create
+
+const addProduct=async(req,res)=>{
     try{
-        const allproduct= await ProductModel.find()
-        res.status(200).json({"AllProdcut":allproduct})
+        const payload=req.body;
+        const product= new ProductModel(payload)
+        await product.save()
+        res.status(200).json({"Added Product":product})
 
     }catch(err)
     {
@@ -13,6 +32,31 @@ const getProduct=async(req,res)=>{
     }
 }
 
+const updateProduct = async (req, res) => {
+    try {
+      const id = req.params.id;
+      const payload = req.body;
+      
+      const updatedProduct = await ProductModel.findByIdAndUpdate(id, payload, { new: true });
+  
+      // Check if the product was found and updated
+      if (!updatedProduct) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
+  
+      // Return the updated product in the response
+      res.status(200).json({ "Updated product": updatedProduct });
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  };
+  
+  module.exports = {
+    updateProduct,
+  };
+  
 module.exports={
-    getProduct
+    getProduct,
+    addProduct,
+    updateProduct
 }
