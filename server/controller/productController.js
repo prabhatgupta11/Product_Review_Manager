@@ -6,6 +6,7 @@ const getProduct = async (req, res) => {
     try {
       if (req.params.id) {
         const productById = await ProductModel.findById(req.params.id);
+        if(!productById) return res.status(200).json( "No Product found by ID" );
         res.status(200).json({ "Product by ID": productById });
       } else {
         const allProducts = await ProductModel.find();
@@ -51,12 +52,25 @@ const updateProduct = async (req, res) => {
     }
   };
   
-  module.exports = {
-    updateProduct,
-  };
+//delete product
+
+const deleteProduct=async(req,res)=>{
+    try{
+       const id=req.params.id
+       const deletedproduct= await ProductModel.findByIdAndDelete(id)
+       res.status(200).json({"Deleted Product":deletedproduct})
+    }catch(err)
+    {
+        res.status(501).json(err.message)
+    }
+}
+
+
   
 module.exports={
     getProduct,
     addProduct,
-    updateProduct
+    updateProduct,
+    deleteProduct,
+
 }
