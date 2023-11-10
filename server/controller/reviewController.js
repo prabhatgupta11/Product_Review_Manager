@@ -1,10 +1,16 @@
 const {ReviewModel}=require("../model/reviewModel")
-
+const {ProductModel}=require("../model/productModel")
 const addreview=async(req,res)=>{
     try{
-      
+         const productID=req.params.productID;
         const payload=req.body;
-        const review= new ReviewModel(payload)
+        const newreview= new ReviewModel(payload)
+        const savedreview= await newreview.save();
+
+   // Associate the review with the corresponding product
+     const product=await ProductModel.findById(productID)
+     product.reviews.push(savedreview._id)
+     await product.save();
         res.status(200).json({"Added review":review})
     }catch(err)
     {
